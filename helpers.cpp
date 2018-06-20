@@ -33,10 +33,28 @@ using namespace std;
 */
 vector< vector<float> > normalize(vector< vector <float> > grid) {
 	
-	vector< vector<float> > newGrid;
-
+	vector< vector<float> > newGrid
 	// todo - your code here
+	int height = grid.size();
+	int width = grid[0].size();
+	newGrid = zeros(height, width);
 
+	float total = 0.0;
+
+	for(int i = 0; i < height; i++)
+	{
+		for(int j = 0; j < width; j++)
+		{
+			total += grid[i][j];
+		}
+	}
+	for(int i = 0; i < height; i++)
+	{
+		for(int j = 0; j < width; j++)
+		{
+			newGrid[i][j] = grid[i][j] / total;
+		}
+	}
 	return newGrid;
 }
 
@@ -74,11 +92,42 @@ vector< vector<float> > normalize(vector< vector <float> > grid) {
     	   has been blurred.
 */
 vector < vector <float> > blur(vector < vector < float> > grid, float blurring) {
-
-	vector < vector <float> > newGrid;
 	
+	vector< vector<float> > newGrid
 	// your code here
+	int height = grid.size();
+	int width = grid[0].size();
 
+	float center_prob = 1.0 - blurring;
+	float corner_prob = blurring / 12.0;
+	float adjacent_prob = blurring / 6.0;
+
+
+	vector< vector<float> > window {
+					{corner_prob, adjacent_prob, corner_prob},
+					{adjacent_prob, center_prob, adjacent_prob},
+					{corner_prob, adjacent_prob, corner_prob}
+					};
+
+	newGrid = zeros(height, width);
+
+	for (int i = 0; i < height; i++)
+	{
+		for (int j = 0; j < width; j++) 
+		{
+			float grid_val = grid[i][j];
+			for (int dx : {-1, 0, 1}) 
+			{
+				for (int dy : {-1, 0, 1}) 
+				{
+					float mult = window[dx+1][dy+1];
+					int new_i = (i + dy) % height;
+					int new_j = (j + dx) % width;
+					newGrid[new_i][new_j] += mult * grid_val;
+				}
+			}
+		}
+	}
 	return normalize(newGrid);
 }
 
